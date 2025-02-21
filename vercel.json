@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/*.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/$1"
+    }
+  ],
+  "env": {
+    "TABLEAU_SERVER_HOST": "https://dub01.online.tableau.com",
+    "TABLEAU_SITE_NAME": "emminexy-f537b42aad",
+    "TABLEAU_TOKEN_NAME": "Log monitor",
+    "LOAD_TIME_THRESHOLD": "10"
+  }
+}
