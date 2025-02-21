@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/*.py",
+      "src": "api/monitor.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "api/$1"
+      "src": "/(.*)",
+      "dest": "api/monitor.py"
     }
   ],
   "env": {
