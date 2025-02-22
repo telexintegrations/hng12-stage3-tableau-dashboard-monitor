@@ -36,7 +36,7 @@ class handler(BaseHTTPRequestHandler):
                         "label": "Time interval",
                         "type": "multi-select",
                         "required": True,
-                        "default": "1 * * * *"
+                        "default": "/15 * * * *"
                     }
                 ],
                 "target_url": "https://ping.telex.im/v1/webhooks/019528ca-ae9c-79d7-a3ed-2dc5866df56a",
