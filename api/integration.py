@@ -39,7 +39,7 @@ class handler(BaseHTTPRequestHandler):
                         "default": "/15 * * * *"
                     }
                 ],
-                "target_url": "https://ping.telex.im/v1/webhooks/019528ca-ae9c-79d7-a3ed-2dc5866df56a",
+                "target_url": "https://ping.telex.im/v1/webhooks/01952fe5-d4fd-7bde-bcd2-7a2fd2c55c87",
                 "tick_url": "https://hng12-stage3-tableau-dashboard-monitor.vercel.app/api/monitor"
             }
         }
