@@ -2,20 +2,41 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/monitor.py",
+      "src": "api/*.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api/integration",
+      "dest": "api/integration.py"
+    },
+    {
+      "src": "/api/monitor",
       "dest": "api/monitor.py"
     }
   ],
-  "env": {
-    "TABLEAU_SERVER_HOST": "https://dub01.online.tableau.com",
-    "TABLEAU_SITE_NAME": "emminexy-f537b42aad",
-    "TABLEAU_TOKEN_NAME": "Log monitor",
-    "LOAD_TIME_THRESHOLD": "10"
-  }
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+        }
+      ]
+    }
+  ]
 }
