@@ -17,7 +17,7 @@ class handler(BaseHTTPRequestHandler):
                 "descriptions": {
                     "app_name": "Tableau Monitor",
                     "app_description": "Detects failures or slow loading of Tableau reports using Tableau Server Logs. Monitors dashboard performance and sends alerts when load times exceed thresholds or when errors occur.",
-                    "app_logo": "https://github.com/telexintegrations/hng12-stage3-tableau-dashboard-monitor/blob/main/download.png",
+                    "app_logo": "https://img.icons8.com/color/48/tableau-software.png",
                     "app_url": "https://hng12-stage3-tableau-dashboard-monitor.vercel.app",
                     "background_color": "#fff"
                 },
