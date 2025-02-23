@@ -137,8 +137,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For support:
 1. Open an issue
-2. Contact via Telex: @cod-emminex
-3. Email: [emminexy@yahoo.com]
+2. Contact via Telex: emminexy@yahoo.com
+3. GitHub: [https://github.com/cod-emminex]
 
 ## Acknowledgments
 
