@@ -3,7 +3,7 @@ from datetime import datetime, UTC
 
 app = Flask(__name__)
 
-@app.route('/api/integration')
+@app.route('/api/integrations')
 def get_integration():
     current_time = datetime.now(UTC).strftime('%Y-%m-%d')
 
