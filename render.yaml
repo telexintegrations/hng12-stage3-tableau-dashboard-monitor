@@ -3,7 +3,7 @@ services:
     name: tableau-monitor
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn api.monitor:handler
+    startCommand: gunicorn 'api.monitor:app'
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.21
