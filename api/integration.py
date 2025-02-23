@@ -4,15 +4,13 @@ from datetime import datetime, UTC
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        # Get current date in YYYY-MM-DD format
-        current_date = datetime.now(UTC).strftime('%Y-%m-%d')
+        current_time = datetime.now(UTC).strftime('%Y-%m-%d')
 
-        # Integration data with exact format
         integration_data = {
             "data": {
                 "date": {
-                    "created_at": "2025-02-22",
-                    "updated_at": "2025-02-22"
+                    "created_at": current_time,
+                    "updated_at": current_time
                 },
                 "descriptions": {
                     "app_name": "Tableau Monitor",
@@ -21,22 +19,28 @@ class handler(BaseHTTPRequestHandler):
                     "app_url": "https://hng12-stage3-tableau-dashboard-monitor.vercel.app",
                     "background_color": "#fff"
                 },
-                "is_active": true,
                 "integration_type": "interval",
                 "integration_category": "Monitoring & Logging",
+                "is_active": True,
                 "key_features": [
                     "Real-time dashboard load time monitoring",
                     "Automatic failure detection",
                     "Performance threshold alerts",
                     "Error log analysis"
                 ],
-                "author": "cod_emminex",
                 "settings": [
                     {
-                        "label": "Time interval",
-                        "type": "multi-select",
-                        "required": true,
-                        "default": "/1 * * * *"
+                        "label": "interval",
+                        "type": "text",
+                        "required": True,
+                        "default": "*/1 * * * *"
+                    },
+                    {
+                        "label": "Load Time Threshold",
+                        "type": "number",
+                        "required": True,
+                        "default": "10",
+                        "description": "Maximum acceptable load time in seconds"
                     }
                 ],
                 "target_url": "https://ping.telex.im/v1/webhooks/01952fe5-d4fd-7bde-bcd2-7a2fd2c55c87",
@@ -56,7 +60,6 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(integration_data, indent=2).encode())
 
     def do_OPTIONS(self):
-        # Handle CORS preflight request
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')

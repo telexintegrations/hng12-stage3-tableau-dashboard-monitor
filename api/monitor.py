@@ -7,7 +7,6 @@ import requests
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        start_time = datetime.now(UTC)
         try:
             # Configuration
             server_url = os.getenv('TABLEAU_SERVER_HOST', 'https://dub01.online.tableau.com')
@@ -49,65 +48,86 @@ class handler(BaseHTTPRequestHandler):
                         "id": view.id,
                         "status": status,
                         "created_at": view.created_at.strftime('%Y-%m-%d %H:%M:%S') if view.created_at else None,
-                        "project_name": view.project_name if hasattr(view, 'project_name') else "No Project"
+                        "project_name": view.project_name if hasattr(view, 'project_name') else None
                     })
 
-                end_time = datetime.now(UTC)
-                check_duration = (end_time - start_time).total_seconds()
+                # Format message
+                views_list = "\n".join([
+                    f"{i+1}. {view['name']} ({view['project_name'] or 'No Project'}) - {view['status'].upper()}"
+                    for i, view in enumerate(view_details)
+                ])
 
+                current_time = datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S')
+                message = (
+                    f"Tableau Monitor Check - {current_time}\n"
+                    f"Server: {server_url}\n"
+                    f"Site: {site_name}\n"
+                    f"Total Views: {len(all_views)}\n"
+                    f"Active Views: {len(all_views) - error_count}\n"
+                    f"Error Views: {error_count}\n\n"
+                    f"Views Status:\n{views_list}"
+                )
+
+                # Send webhook notification in correct format
+                webhook_data = {
+                    "message": message,
+                    "username": "Tableau Monitor",
+                    "event_name": "tableau_monitor_check",
+                    "status": "error" if error_count > 0 else "success"
+                }
+
+                requests.post(
+                    webhook_url,
+                    json=webhook_data,
+                    headers={"Content-Type": "application/json"}
+                )
+
+                # Response for API endpoint
                 response_data = {
                     "success": True,
-                    "timestamp": end_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    "timestamp": current_time,
                     "user": "cod-emminex",
                     "total_views": len(all_views),
                     "server_url": server_url,
                     "site_name": site_name,
                     "views": view_details,
-                    "check_duration": f"{check_duration:.2f}s",
                     "errors_found": error_count
                 }
-
-                # Create detailed message for webhook with all views
-                status = "warning" if error_count > 0 else "success"
-
-                # Build the views list string
-                views_list = "\n".join([
-                    f"{i+1}. {view['name']} ({view['project_name']}) - {view['status']}"
-                    for i, view in enumerate(view_details)
-                ])
-
-                message = (
-                    f"Monitor Check ({end_time.strftime('%Y-%m-%d %H:%M:%S')})\n"
-                    f"Total Views: {len(all_views)}\n"
-                    f"Active Views: {len(all_views) - error_count}\n"
-                    f"Error Views: {error_count}\n"
-                    f"Check Duration: {check_duration:.2f}s\n"
-                    f"Projects: {len(set(v['project_name'] for v in view_details))}\n\n"
-                    f"Views List:\n{views_list}"
-                )
-
-                # Send webhook notification
-                webhook_payload = {
-                    "event_name": "tableau_monitor_check",
-                    "username": "cod-emminex",
-                    "status": status,
-                    "message": message
-                }
-
-                requests.post(
-                    webhook_url,
-                    json=webhook_payload,
-                    headers={"Content-Type": "application/json"}
-                )
 
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            self.wfile.write(json.dumps(response_data).encode())
+            self.wfile.write(json.dumps(response_data, indent=2).encode())
 
         except Exception as e:
             error_time = datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S')
+
+            # Send webhook error notification in correct format
+            try:
+                error_message = (
+                    f"Tableau Monitor Error - {error_time}\n"
+                    f"Server: {os.getenv('TABLEAU_SERVER_HOST', 'N/A')}\n"
+                    f"Site: {os.getenv('TABLEAU_SITE_NAME', 'N/A')}\n"
+                    f"Error: {str(e)}"
+                )
+
+                webhook_data = {
+                    "message": error_message,
+                    "username": "Tableau Monitor",
+                    "event_name": "tableau_monitor_error",
+                    "status": "error"
+                }
+
+                requests.post(
+                    webhook_url,
+                    json=webhook_data,
+                    headers={"Content-Type": "application/json"}
+                )
+            except:
+                pass
+
+            # Response for API endpoint
             error_data = {
                 "success": False,
                 "timestamp": error_time,
@@ -115,33 +135,11 @@ class handler(BaseHTTPRequestHandler):
                 "error": str(e)
             }
 
-            # Send webhook error notification with more detail
-            try:
-                error_message = (
-                    f"Monitor Error ({error_time})\n"
-                    f"Error: {str(e)}\n"
-                    f"Server: {os.getenv('TABLEAU_SERVER_HOST', 'N/A')}\n"
-                    f"Site: {os.getenv('TABLEAU_SITE_NAME', 'N/A')}"
-                )
-
-                requests.post(
-                    webhook_url,
-                    json={
-                        "event_name": "tableau_monitor_error",
-                        "username": "cod-emminex",
-                        "status": "error",
-                        "message": error_message
-                    },
-                    headers={"Content-Type": "application/json"}
-                )
-            except:
-                pass
-
             self.send_response(500)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            self.wfile.write(json.dumps(error_data).encode())
+            self.wfile.write(json.dumps(error_data, indent=2).encode())
 
     def do_OPTIONS(self):
         self.send_response(200)
