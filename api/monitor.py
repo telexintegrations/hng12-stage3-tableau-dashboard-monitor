@@ -5,7 +5,7 @@ from datetime import datetime, UTC
 import tableauserverclient as TSC
 import requests
 
-class handler(BaseHTTPRequestHandler):
+class MonitorHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             # Configuration
@@ -51,7 +51,7 @@ class handler(BaseHTTPRequestHandler):
                         "project_name": view.project_name if hasattr(view, 'project_name') else None
                     })
 
-                # Format message
+                # Format message for webhook
                 views_list = "\n".join([
                     f"{i+1}. {view['name']} ({view['project_name'] or 'No Project'}) - {view['status'].upper()}"
                     for i, view in enumerate(view_details)
@@ -68,7 +68,7 @@ class handler(BaseHTTPRequestHandler):
                     f"Views Status:\n{views_list}"
                 )
 
-                # Send webhook notification in correct format
+                # Send webhook notification
                 webhook_data = {
                     "message": message,
                     "username": "Tableau Monitor",
@@ -103,7 +103,7 @@ class handler(BaseHTTPRequestHandler):
         except Exception as e:
             error_time = datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S')
 
-            # Send webhook error notification in correct format
+            # Send webhook error notification
             try:
                 error_message = (
                     f"Tableau Monitor Error - {error_time}\n"
@@ -147,3 +147,5 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
+
+handler = MonitorHandler
