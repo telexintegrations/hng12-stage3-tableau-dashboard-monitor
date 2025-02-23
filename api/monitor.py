@@ -49,7 +49,7 @@ class handler(BaseHTTPRequestHandler):
                         "id": view.id,
                         "status": status,
                         "created_at": view.created_at.strftime('%Y-%m-%d %H:%M:%S') if view.created_at else None,
-                        "project_name": view.project_name if hasattr(view, 'project_name') else None
+                        "project_name": view.project_name if hasattr(view, 'project_name') else "No Project"
                     })
 
                 end_time = datetime.now(UTC)
@@ -67,15 +67,23 @@ class handler(BaseHTTPRequestHandler):
                     "errors_found": error_count
                 }
 
-                # Create detailed message for webhook
+                # Create detailed message for webhook with all views
                 status = "warning" if error_count > 0 else "success"
+
+                # Build the views list string
+                views_list = "\n".join([
+                    f"{i+1}. {view['name']} ({view['project_name']}) - {view['status']}"
+                    for i, view in enumerate(view_details)
+                ])
+
                 message = (
                     f"Monitor Check ({end_time.strftime('%Y-%m-%d %H:%M:%S')})\n"
                     f"Total Views: {len(all_views)}\n"
                     f"Active Views: {len(all_views) - error_count}\n"
                     f"Error Views: {error_count}\n"
                     f"Check Duration: {check_duration:.2f}s\n"
-                    f"Projects: {len(set(v['project_name'] for v in view_details if v['project_name']))}"
+                    f"Projects: {len(set(v['project_name'] for v in view_details))}\n\n"
+                    f"Views List:\n{views_list}"
                 )
 
                 # Send webhook notification
