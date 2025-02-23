@@ -15,7 +15,7 @@ A Telex integration that monitors Tableau dashboards for performance issues and 
 
 ## Screenshots
 
-![Telex Integration Example](docs/telex-integration.png)
+![Telex Integration Example](https://github.com/telexintegrations/hng12-stage3-tableau-dashboard-monitor/blob/main/Capture.PNG)
 
 Example alerts in Telex channel:
 ```
