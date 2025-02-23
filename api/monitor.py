@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import json
 import os
 from datetime import datetime, UTC
@@ -7,7 +7,19 @@ import requests
 
 app = Flask(__name__)
 
-@app.route('/api/integration')
+@app.route('/')
+def home():
+    return jsonify({
+        "status": "ok",
+        "message": "Tableau Monitor API is running",
+        "timestamp": datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S'),
+        "endpoints": [
+            "/api/integration",
+            "/api/monitor"
+        ]
+    })
+
+@app.route('/api/integration', methods=['GET'])
 def get_integration():
     current_time = datetime.now(UTC).strftime('%Y-%m-%d')
 
@@ -55,7 +67,7 @@ def get_integration():
 
     return jsonify(integration_data)
 
-@app.route('/api/monitor')
+@app.route('/api/monitor', methods=['GET', 'POST'])
 def monitor():
     try:
         # Configuration
@@ -64,6 +76,13 @@ def monitor():
         token_name = os.getenv('TABLEAU_TOKEN_NAME', 'TelescopeMonitoring')
         token = os.getenv('TABLEAU_API_TOKEN')
         webhook_url = "https://ping.telex.im/v1/webhooks/01952fe5-d4fd-7bde-bcd2-7a2fd2c55c87"
+
+        # Get return_url from POST data if available
+        if request.method == 'POST':
+            data = request.get_json()
+            return_url = data.get('return_url', webhook_url)
+        else:
+            return_url = webhook_url
 
         # Initialize Tableau connection
         tableau_auth = TSC.PersonalAccessTokenAuth(
@@ -126,8 +145,9 @@ def monitor():
                 "status": "error" if error_count > 0 else "success"
             }
 
+            # Send to the appropriate URL
             requests.post(
-                webhook_url,
+                return_url,
                 json=webhook_data,
                 headers={"Content-Type": "application/json"}
             )
@@ -166,7 +186,7 @@ def monitor():
             }
 
             requests.post(
-                webhook_url,
+                return_url if 'return_url' in locals() else webhook_url,
                 json=webhook_data,
                 headers={"Content-Type": "application/json"}
             )
@@ -181,27 +201,6 @@ def monitor():
         }
 
         return jsonify(error_data), 500
-
-@app.route('/')
-def home():
-    return jsonify({
-        "status": "ok",
-        "timestamp": datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S'),
-        "message": "Tableau Monitor API is running",
-        "user": "cod-emminex",
-        "endpoints": [
-            "/api/monitor",
-            "/api/integration"
-        ]
-    })
-
-# Add CORS headers
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, OPTIONS')
-    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 8000)))
