@@ -41,14 +41,14 @@ jobs:
       run: |
         echo "Checking required files..."
         test -f requirements.txt || (echo "requirements.txt missing" && exit 1)
-        test -f api/app.py || (echo "api/app.py missing" && exit 1)
+        test -f api/monitor.py || (echo "api/monitor.py missing" && exit 1)
         test -f render.yaml || (echo "render.yaml missing" && exit 1)
         echo "All required files present"
 
     - name: Verify Flask app configuration
       run: |
         echo "Checking Flask app configuration..."
-        python -c "from api.app import app; assert app.name == 'api.app', 'Invalid Flask app name'"
+        python -c "from api.monitor import app; assert app.name == 'api.monitor', 'Invalid Flask app name'"
         echo "Flask app configuration verified"
 
     - name: Upload build artifacts
