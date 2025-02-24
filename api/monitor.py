@@ -70,7 +70,7 @@ def get_integration():
             "author": "cod_emminex",
             "settings": [
                 {
-                    "label": "Time interval",
+                    "label": "interval",
                     "type": "text",
                     "required": True,
                     "default": "*/2 * * * *"
