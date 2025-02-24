@@ -225,6 +225,6 @@ if __name__ == '__main__':
 
     # Start keep-alive thread
     keep_alive_thread = threading.Thread(target=keep_alive, daemon=True)
-keep_alive_thread.start()
+    keep_alive_thread.start()
 
-    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 8000)))
+app.run(host='0.0.0.0', port=int(os.getenv('PORT', 8000)))
