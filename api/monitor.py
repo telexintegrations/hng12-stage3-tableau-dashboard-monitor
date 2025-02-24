@@ -74,7 +74,7 @@ def get_integration():
                     "label": "Time interval",
                     "type": "text",
                     "required": True,
-                    "default": "*/40 * * * *"
+                    "default": "*/2 * * * *"
                 },
                 {
                     "label": "Load Time Threshold",
