@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, request
+
+m flask import Flask, jsonify, request
 import json
 from flask_cors import CORS
 import os
@@ -31,7 +32,7 @@ def home():
     return jsonify({
         "status": "ok",
         "message": "Tableau Monitor API is running",
-        "timestamp": last_health_check.strftime('%Y-%m-%d %H:%M:%S'),
+        "timestamp": "2025-02-24 17:47:27",
         "user": "cod-emminex",
         "uptime": "Active",
         "endpoints": [
@@ -42,9 +43,8 @@ def home():
 
 @app.route('/api/integration', methods=['GET'])
 def get_integration():
-    # Get current UTC date in YYYY-MM-DD format
-    created_date = "2025-02-23"  # Fixed creation date
-    updated_date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    created_date = "2025-02-23"
+    updated_date = "2025-02-24"
 
     integration_data = {
         "data": {
@@ -149,7 +149,7 @@ def monitor():
                 for i, view in enumerate(view_details)
                 ])
 
-            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            current_time = "2025-02-24 17:47:27"
             message = (
                     f"Tableau Monitor Check - {current_time}\n"
                     f"Server: {server_url}\n"
@@ -190,7 +190,7 @@ def monitor():
             return jsonify(response_data)
 
     except Exception as e:
-        error_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        error_time = "2025-02-24 17:47:27"
 
         # Send webhook error notification
         try:
@@ -226,9 +226,8 @@ def monitor():
         return jsonify(error_data), 500
 
 if __name__ == '__main__':
-
     # Start keep-alive thread
     keep_alive_thread = threading.Thread(target=keep_alive, daemon=True)
     keep_alive_thread.start()
 
-app.run(host='0.0.0.0', port=int(os.getenv('PORT', 8000)))
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 8000)))
