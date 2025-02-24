@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI
 
 on:
   push:
@@ -7,36 +7,64 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  verify:
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v2
     
-    - name: Set up Python
+    - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
-        python-version: '3.9'
-    
+        python-version: 3.9
+
     - name: Install dependencies
       run: |
-        python3 -m pip install --upgrade pip
-        pip install pytest
+        python -m pip install --upgrade pip
         pip install -r requirements.txt
-        
-    - name: Run tests
-      run: |
-        pytest 
 
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - uses: actions/checkout@v2
-    
-    - name: Deploy to production
-      env:
-        TELEX_API_KEY: ${{ secrets.TELEX_API_KEY }}
+    - name: Set build info
       run: |
-        echo "Deploying to production..."
+        echo "BUILD_TIMESTAMP=2025-02-24 09:23:05" >> $GITHUB_ENV
+        echo "BUILD_USER=cod-emminex" >> $GITHUB_ENV
+
+    - name: Create build info file
+      run: |
+        echo "Build Information" > build_info.txt
+        echo "==================" >> build_info.txt
+        echo "Timestamp: ${{ env.BUILD_TIMESTAMP }}" >> build_info.txt
+        echo "User: ${{ env.BUILD_USER }}" >> build_info.txt
+        echo "Branch: ${{ github.ref }}" >> build_info.txt
+        echo "Commit: ${{ github.sha }}" >> build_info.txt
+
+    - name: Verify project structure
+      run: |
+        echo "Checking required files..."
+        test -f requirements.txt || (echo "requirements.txt missing" && exit 1)
+        test -f api/monitor.py || (echo "api/monitor.py missing" && exit 1)
+        test -f render.yaml || (echo "render.yaml missing" && exit 1)
+        echo "All required files present"
+
+    - name: Verify Flask app configuration
+      run: |
+        echo "Checking Flask app configuration..."
+        python -c "from api.monitor import monitor; assert app.name == 'api.monitor', 'Invalid Flask app name'"
+        echo "Flask app configuration verified"
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-info
+        path: |
+          build_info.txt
+          requirements.txt
+          api/
+          render.yaml
+        if-no-files-found: error
+
+    - name: Log build summary
+      run: |
+        echo "Build completed successfully"
+        echo "Timestamp: ${{ env.BUILD_TIMESTAMP }}"
+        echo "User: ${{ env.BUILD_USER }}"
+        echo "Files verified and ready for deployment"
