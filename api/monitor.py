@@ -83,7 +83,7 @@ def get_integration():
                     "default": "10"
                 }
             ],
-            "target_url": "https://ping.telex.im/v1/webhooks/01952fe5-d4fd-7bde-bcd2-7a2fd2c55c87",
+            "target_url": "https://ping.telex.im/v1/webhooks/01953892-321f-7401-95d8-abca44d5f557",
             "tick_url": "https://hng12-stage3-tableau-dashboard-monitor.onrender.com/api/monitor"
         }
     }
@@ -98,7 +98,7 @@ def monitor():
         site_name = os.getenv('TABLEAU_SITE_NAME', 'emminexy-f537b42aad')
         token_name = os.getenv('TABLEAU_TOKEN_NAME', 'TelescopeMonitoring')
         token = os.getenv('TABLEAU_API_TOKEN')
-        webhook_url = "https://ping.telex.im/v1/webhooks/01952fe5-d4fd-7bde-bcd2-7a2fd2c55c87"
+        webhook_url = "https://ping.telex.im/v1/webhooks/01953892-321f-7401-95d8-abca44d5f557"
 
         # Get return_url from POST data if available
         if request.method == 'POST':
