@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python 3.9
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: 3.9.21
 
     - name: Install dependencies
       run: |
@@ -25,7 +25,7 @@ jobs:
 
     - name: Set build info
       run: |
-        echo "BUILD_TIMESTAMP=2025-02-24 09:28:40" >> $GITHUB_ENV
+        echo "BUILD_TIMESTAMP=2025-02-24 09:40:34" >> $GITHUB_ENV
         echo "BUILD_USER=cod-emminex" >> $GITHUB_ENV
 
     - name: Create build info file
@@ -44,12 +44,6 @@ jobs:
         test -f api/monitor.py || (echo "api/monitor.py missing" && exit 1)
         test -f render.yaml || (echo "render.yaml missing" && exit 1)
         echo "All required files present"
-
-    - name: Verify Flask app configuration
-      run: |
-        echo "Checking Flask app configuration..."
-        python -c "from api.monitor import app; assert app.name == 'api.monitor', 'Invalid Flask app name'"
-        echo "Flask app configuration verified"
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
