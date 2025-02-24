@@ -149,7 +149,7 @@ def monitor():
                 for i, view in enumerate(view_details)
                 ])
 
-            current_time = datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S')
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             message = (
                     f"Tableau Monitor Check - {current_time}\n"
                     f"Server: {server_url}\n"
@@ -190,7 +190,7 @@ def monitor():
             return jsonify(response_data)
 
     except Exception as e:
-        error_time = datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S')
+        error_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         # Send webhook error notification
         try:
