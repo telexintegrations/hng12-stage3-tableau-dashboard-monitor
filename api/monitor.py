@@ -1,21 +1,23 @@
 from flask import Flask, jsonify, request
-import threading
-import time
 import json
+from flask_cors import CORS
 import os
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 import tableauserverclient as TSC
 import requests
+import threading
+import time
 
 app = Flask(__name__)
+CORS(app)
 
-last_health_check = datetime.now(UTC)
-health_check_interval = 60
+last_health_check = datetime.now(timezone.utc)
+health_check_interval = 60  # seconds
 
 def keep_alive():
     while True:
         try:
-            current_time = datetime.now(UTC)
+            current_time = datetime.now(timezone.utc)
             requests.get('https://hng12-stage3-tableau-dashboard-monitor.onrender.com/')
             time.sleep(health_check_interval)
         except Exception as e:
@@ -25,7 +27,7 @@ def keep_alive():
 @app.route('/')
 def home():
     global last_health_check
-    last_health_check = datetime.now(UTC)
+    last_health_check = datetime.now(timezone.utc)
     return jsonify({
         "status": "ok",
         "message": "Tableau Monitor API is running",
@@ -35,54 +37,57 @@ def home():
         "endpoints": [
             "/api/integration",
             "/api/monitor"
-            ]
-        })
+        ]
+    })
 
 @app.route('/api/integration', methods=['GET'])
 def get_integration():
-    current_time = datetime.now(UTC).strftime('%Y-%m-%d')
+    # Get current UTC date in YYYY-MM-DD format
+    created_date = "2025-02-23"  # Fixed creation date
+    updated_date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
 
     integration_data = {
-            "data": {
-                "date": {
-                    "created_at": "2025-02-23",
-                    "updated_at": "2025-02-24"
-                    },
-                "descriptions": {
-                    "app_name": "Tableau Monitor",
-                    "app_description": "Detects failures or slow loading of Tableau reports using Tableau Server Logs. Monitors dashboard performance and sends alerts when load times exceed thresholds or when errors occur.",
-                    "app_logo": "https://img.icons8.com/color/48/tableau-software.png",
-                    "app_url": "https://hng12-stage3-tableau-dashboard-monitor.onrender.com",
-                    "background_color": "#fff"
-                    },
-                "is_active": true,
-                "integration_type": "interval",
-                "integration_category": "Monitoring & Logging",
-                "key_features": [
-                    "Real-time dashboard load time monitoring",
-                    "Automatic failure detection",
-                    "Performance threshold alerts",
-                    "Error log analysis"
-                    ],
-                "author": "cod_emminex",
-                "settings": [
-                    {
-                        "label": "Time interval",
-                        "type": "text",
-                        "required": true,
-                        "default": "*/40 * * * *"
-                        },
-                    {
-                        "label": "Load Time Threshold",
-                        "type": "number",
-                        "required": true,
-                        "default": "10"
-                        }
-                    ],
-                "target_url": "https://ping.telex.im/v1/webhooks/01952fe5-d4fd-7bde-bcd2-7a2fd2c55c87",
-                "tick_url": "https://hng12-stage3-tableau-dashboard-monitor.onrender.com/api/monitor"
+        "data": {
+            "date": {
+                "created_at": created_date,
+                "updated_at": updated_date
+            },
+            "descriptions": {
+                "app_name": "Tableau Monitor",
+                "app_description": "Detects failures or slow loading of Tableau reports using Tableau Server Logs. Monitors dashboard performance and sends alerts when load times exceed thresholds or when errors occur.",
+                "app_logo": "https://img.icons8.com/color/48/tableau-software.png",
+                "app_url": "https://hng12-stage3-tableau-dashboard-monitor.onrender.com",
+                "background_color": "#fff"
+            },
+            "is_active": True,
+            "integration_type": "interval",
+            "integration_category": "Monitoring & Logging",
+            "key_features": [
+                "Real-time dashboard load time monitoring",
+                "Automatic failure detection",
+                "Performance threshold alerts",
+                "Error log analysis"
+            ],
+            "author": "cod_emminex",
+            "settings": [
+                {
+                    "label": "Time interval",
+                    "type": "text",
+                    "required": True,
+                    "default": "*/40 * * * *"
+                },
+                {
+                    "label": "Load Time Threshold",
+                    "type": "number",
+                    "required": True,
+                    "default": "10"
                 }
-            }
+            ],
+            "target_url": "https://ping.telex.im/v1/webhooks/01952fe5-d4fd-7bde-bcd2-7a2fd2c55c87",
+            "tick_url": "https://hng12-stage3-tableau-dashboard-monitor.onrender.com/api/monitor"
+        }
+    }
+
     return jsonify(integration_data)
 
 @app.route('/api/monitor', methods=['GET', 'POST'])
