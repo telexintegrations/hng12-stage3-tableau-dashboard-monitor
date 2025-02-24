@@ -3,7 +3,7 @@ import requests
 import json
 
 def test_webhook():
-    webhook_url = "https://ping.telex.im/v1/webhooks/019528ca-ae9c-79d7-a3ed-2dc5866df56a"
+    webhook_url = "https://ping.telex.im/v1/webhooks/01952fe5-d4fd-7bde-bcd2-7a2fd2c55c87"
     current_time = datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S')
 
     # Updated payload structure according to Telex requirements

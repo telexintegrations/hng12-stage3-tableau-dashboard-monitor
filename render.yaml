@@ -3,7 +3,10 @@ services:
     name: tableau-monitor
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn 'api.monitor:app'
+    startCommand: gunicorn "api.app:app" --timeout 120
+    healthCheckPath: /
+    healthCheckTimeout: 100
+    autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.21
@@ -15,3 +18,6 @@ services:
         sync: false
       - key: TABLEAU_API_TOKEN
         sync: false
+    scaling:
+      minInstances: 1
+      maxInstances: 1

@@ -1,4 +1,6 @@
 from flask import Flask, jsonify, request
+import threading
+import time
 import json
 import os
 from datetime import datetime, UTC
@@ -7,12 +9,29 @@ import requests
 
 app = Flask(__name__)
 
+last_health_check = datetime.now(UTC)
+health_check_interval = 60
+
+def keep_alive():
+    while True:
+        try:
+            current_time = datetime.now(UTC)
+            requests.get('https://hng12-stage3-tableau-dashboard-monitor.onrender.com/')
+            time.sleep(health_check_interval)
+        except Exception as e:
+            print(f"Keep-alive error: {str(e)}")
+            time.sleep(5)
+
 @app.route('/')
 def home():
+    global last_health_check
+    last_health_check = datetime.now(UTC)
     return jsonify({
         "status": "ok",
         "message": "Tableau Monitor API is running",
-        "timestamp": datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S'),
+        "timestamp": last_health_check.strftime('%Y-%m-%d %H:%M:%S'),
+        "user": "cod-emminex",
+        "uptime": "Active",
         "endpoints": [
             "/api/integration",
             "/api/monitor"
@@ -203,4 +222,9 @@ def monitor():
         return jsonify(error_data), 500
 
 if __name__ == '__main__':
+
+    # Start keep-alive thread
+    keep_alive_thread = threading.Thread(target=keep_alive, daemon=True)
+keep_alive_thread.start()
+
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 8000)))
